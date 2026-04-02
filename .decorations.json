@@ -1,0 +1,20 @@
+{
+  "files": ["**/*.c", "**/*.h"],
+  "decorations": [
+    {
+      "pattern": "normal.c",
+      "lineNumbers": [16,17,18,19,20,21,22,23,25,26,28,30,31],
+      "gutterIconText": ["200","200","200","200","200","200","200","62","138","51","87","87","200"],
+      "gutterIconColor": "#FFA500",
+      "gutterIconFontSize": "14px"
+    },
+    {
+      "pattern": "normal.c",
+      "lineNumbers": [15],
+      "beforeText": "Enter Pipeline | Total IPC: 0.489378 | Self IPC:  | Self Instructions: 1313 | Total Cyc",
+      "beforeColor": "#0000FF",
+      "beforeFontSize": "14px",
+      "beforeBackgroundColor": "#F0F0F0"
+    }
+  ]
+}
