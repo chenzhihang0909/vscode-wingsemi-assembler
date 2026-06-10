@@ -4,8 +4,8 @@ class Logger {
     readonly logger: vscode.OutputChannel;
 
     constructor() {
-        this.logger = vscode.window.createOutputChannel("Compiler Explorer");
-        this.logger.appendLine("Compiler Explorer is now active!");
+        this.logger = vscode.window.createOutputChannel("Wingsemi Assembler");
+        this.logger.appendLine("Wingsemi Assembler is now active!");
     }
 
     info(message: string) {

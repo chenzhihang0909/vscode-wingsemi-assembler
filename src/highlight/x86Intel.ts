@@ -186,6 +186,16 @@ const registers = [
 const operators = ["+", "-", "*", "/", "%", "&", "|", "^", "<", ">", "~", "!", ":", ",", "[", "]", "#", ";"];
 
 export function highlight(text: string) {
+    if (!text) return "";
+
+    // 如果传入的是数组（asm 数组），强制转成字符串
+    if (Array.isArray(text)) {
+        return text.map(item => {
+            if (typeof item === "string") return item;
+            if (item?.text) return item.text;
+            return "";
+        }).join("");
+    }
     const isInstructionFirst = text.startsWith(" ");
     let isFirstToekn = true;
     let result = "";
@@ -195,10 +205,10 @@ export function highlight(text: string) {
             result += text[index];
             index++;
         } else if (text[index] === ";" || text[index] === "#") {
-            result += `<span class="compiler-explorer-comment">${text.slice(index)}</span>`;
+            result += `<span class="wingsemi-assembler-comment">${text.slice(index)}</span>`;
             break;
         } else if (operators.includes(text[index])) {
-            result += `<span class="compiler-explorer-operator">${text[index]}</span>`;
+            result += `<span class="wingsemi-assembler-operator">${text[index]}</span>`;
             index++;
         } else if (text[index] === '"') {
             let temp = '"';
@@ -209,7 +219,7 @@ export function highlight(text: string) {
             }
             temp += '"';
             index++;
-            result += `<span class="compiler-explorer-string">${temp}</span>`;
+            result += `<span class="wingsemi-assembler-string">${temp}</span>`;
         } else if (text[index] >= "0" && text[index] <= "9") {
             let temp = text[index];
             index++;
@@ -217,7 +227,7 @@ export function highlight(text: string) {
                 temp += text[index];
                 index++;
             }
-            result += `<span class="compiler-explorer-number">${temp}</span>`;
+            result += `<span class="wingsemi-assembler-number">${temp}</span>`;
         } else {
             let temp = text[index];
             index++;
@@ -226,14 +236,14 @@ export function highlight(text: string) {
                 index++;
             }
             if (isFirstToekn) {
-                result += `<span class="compiler-explorer-${
+                result += `<span class="wingsemi-assembler-${
                     isInstructionFirst ? "instruction" : "symbol"
                 }">${temp}</span>`;
                 isFirstToekn = false;
             } else if (registers.includes(temp)) {
-                result += `<span class="compiler-explorer-register">${temp}</span>`;
+                result += `<span class="wingsemi-assembler-register">${temp}</span>`;
             } else {
-                result += `<span class="compiler-explorer-symbol">${temp}</span>`;
+                result += `<span class="wingsemi-assembler-symbol">${temp}</span>`;
             }
         }
     }

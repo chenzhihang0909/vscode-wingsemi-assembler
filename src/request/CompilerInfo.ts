@@ -20,7 +20,7 @@ const idToName = new Map<string, string>();
 export async function GetCompilerInfos() {
     if (compilerInfos.size === 0) {
         const fieldNames = Object.keys(new CompilerInfo()).join(",");
-        const url = "https://godbolt.org/api/compilers/c++?fields=" + fieldNames;
+        const url = "http://127.0.0.1:10240/api/compilers/c++?fields=" + fieldNames;
 
         await retry("CompilerInfo", async () => {
             logger.info(`Request for CompilerInfo from ${url}`);

@@ -40,7 +40,7 @@ export interface ColorConfig {
 }
 
 export class Config {
-    static _config = vscode.workspace.getConfiguration("compiler-explorer");
+    static _config = vscode.workspace.getConfiguration("wingsemi-assembler");
 
     static defaultOptions() {
         return Config._config.get<OptionsConfig>("default.options")!;

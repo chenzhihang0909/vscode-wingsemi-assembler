@@ -111,8 +111,15 @@ export async function ReadCMakeSource(src: string) {
             const fullname = path.join(src, filename);
             const stats = await stat(fullname);
             if (stats.isFile()) {
-                // TODO: Filters files according to the setting.json
-                if (filename !== "CMakeLists.txt") {
+
+                // ==============================
+                // 🔥 在这里加过滤（只保留源码）
+                // ==============================
+                const ext = path.extname(filename).toLowerCase();
+                const allowedExtensions = ['.c', '.h', '.s', '.S'];  // 👈 只留 C / 头 / 汇编
+
+                // 只添加允许的文件，跳过 CMakeLists.txt（已经单独读了）
+                if (allowedExtensions.includes(ext) && filename !== "CMakeLists.txt") {
                     files.push({ filename: filename, contents: await ReadSource(fullname) });
                 }
             }
@@ -129,7 +136,7 @@ async function CreateTempDir() {
         throw Error("No workspace folder found");
     }
 
-    const dir = path.join(workspacePath, ".compiler-explorer");
+    const dir = path.join(workspacePath, ".wingsemi-assembler");
     if (!existsSync(dir)) {
         await mkdir(dir);
     }

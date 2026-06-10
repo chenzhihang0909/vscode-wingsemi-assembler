@@ -1,12 +1,12 @@
 {
     "icon": "resources/single.png",
-    "name": "vscode-compiler-explorer",
-    "displayName": "Compiler Explorer for VSCode",
+    "name": "vscode-wingsemi-assembler",
+    "displayName": "Wingsemi Assembler for VSCode",
     "description": "Out-of-the-box C++ online compiler",
     "publisher": "ykiko",
     "repository": {
         "type": "git",
-        "url": "https://github.com/16bit-ykiko/vscode-compiler-explorer"
+        "url": "https://github.com/16bit-ykiko/vscode-wingsemi-assembler"
     },
     "version": "0.9.9",
     "engines": {
@@ -15,234 +15,203 @@
     "categories": [
         "Other"
     ],
-    "activationEvents": [],
+    "activationEvents": ["onStartupFinished"],
     "main": "./dist/extension.js",
     "contributes": {
         "viewsContainers": {
             "activitybar": [
                 {
-                    "id": "compiler-explorer",
-                    "title": "Compiler Explorer",
+                    "id": "wingsemi-assembler",
+                    "title": "Wingsemi Assembler",
                     "icon": "resources/icon.svg"
                 }
             ]
         },
         "viewsWelcome": [
             {
-                "view": "compiler-explorer.view",
-                "contents": "Compiler Explorer is loading..."
+                "view": "wingsemi-assembler.view",
+                "contents": "Wingsemi Assembler is loading..."
             }
         ],
         "views": {
-            "compiler-explorer": [
+            "wingsemi-assembler": [
                 {
-                    "id": "compiler-explorer.view",
-                    "name": "Compiler Explorer"
+                    "id": "wingsemi-assembler.view",
+                    "name": "Wingsemi Assembler"
                 }
             ]
         },
         "commands": [
             {
-                "command": "compiler-explorer.CompileAll",
+                "command": "wingsemi-assembler.CompileAll",
                 "title": "Compile All Instances",
-                "category": "Compiler Explorer",
+                "category": "Wingsemi Assembler",
                 "icon": "$(run-all)"
             },
             {
-                "command": "compiler-explorer.AddSingleInstance",
+                "command": "wingsemi-assembler.AddSingleInstance",
                 "title": "Add New",
-                "category": "Compiler Explorer",
+                "category": "Wingsemi Assembler",
                 "icon": "$(add)"
             },
             {
-                "command": "compiler-explorer.RemoveAll",
-                "title": "Remove All",
-                "category": "Compiler Explorer",
-                "icon": "$(trashcan)"
-            },
-            {
-                "command": "compiler-explorer.AddMultiInstance",
+                "command": "wingsemi-assembler.AddMultiInstance",
                 "title": "Add CMake",
-                "category": "Compiler Explorer",
+                "category": "Wingsemi Assembler",
                 "icon": "$(add)"
             },
             {
-                "command": "compiler-explorer.Clear",
-                "title": "Clear All",
-                "category": "Compiler Explorer",
-                "icon": "$(clear-all)"
-            },
-            {
-                "command": "compiler-explorer.GetLink",
-                "title": "Share Link",
-                "category": "Compiler Explorer",
-                "icon": "$(link-external)"
-            },
-            {
-                "command": "compiler-explorer.LoadLink",
-                "title": "Load Link",
-                "category": "Compiler Explorer",
-                "icon": "$(link)"
-            },
-            {
-                "command": "compiler-explorer.Remove",
-                "title": "Remove Current",
-                "category": "Compiler Explorer",
+                "command": "wingsemi-assembler.RemoveAll",
+                "title": "Remove All",
+                "category": "Wingsemi Assembler",
                 "icon": "$(trashcan)"
             },
             {
-                "command": "compiler-explorer.Compile",
+                "command": "wingsemi-assembler.Remove",
+                "title": "Remove Current",
+                "category": "Wingsemi Assembler",
+                "icon": "$(trashcan)"
+            },
+            {
+                "command": "wingsemi-assembler.Compile",
                 "title": "Compile Current",
-                "category": "Compiler Explorer",
+                "category": "Wingsemi Assembler",
                 "icon": "$(run)"
             },
             {
-                "command": "compiler-explorer.Clone",
+                "command": "wingsemi-assembler.Clone",
                 "title": "Clone Current",
-                "category": "Compiler Explorer",
+                "category": "Wingsemi Assembler",
                 "icon": "$(expand-all)"
             },
             {
-                "command": "compiler-explorer.SelectCompiler",
+                "command": "wingsemi-assembler.SelectCompiler",
                 "title": "Select Compiler",
-                "category": "Compiler Explorer",
+                "category": "Wingsemi Assembler",
                 "icon": "$(list-selection)"
             },
             {
-                "command": "compiler-explorer.GetInput",
+                "command": "wingsemi-assembler.GetInput",
                 "title": "Get Input",
-                "category": "Compiler Explorer",
+                "category": "Wingsemi Assembler",
                 "icon": "$(pencil)"
             },
             {
-                "command": "compiler-explorer.ClearInput",
+                "command": "wingsemi-assembler.ClearInput",
                 "title": "Clear Input",
-                "category": "Compiler Explorer",
+                "category": "Wingsemi Assembler",
                 "icon": "$(clear-all)"
             },
             {
-                "command": "compiler-explorer.CopyText",
+                "command": "wingsemi-assembler.CopyText",
                 "title": "Copy Input",
-                "category": "Compiler Explorer",
+                "category": "Wingsemi Assembler",
                 "icon": "$(clippy)"
             },
             {
-                "command": "compiler-explorer.OpenTempFile",
+                "command": "wingsemi-assembler.OpenTempFile",
                 "title": "Open Temp File",
-                "category": "Compiler Explorer",
+                "category": "Wingsemi Assembler",
                 "icon": "$(file)"
             },
             {
-                "command": "compiler-explorer.SelectFile",
+                "command": "wingsemi-assembler.SelectFile",
                 "title": "Select File",
-                "category": "Compiler Explorer",
+                "category": "Wingsemi Assembler",
                 "icon": "$(file)"
             },
             {
-                "command": "compiler-explorer.SelectFolder",
+                "command": "wingsemi-assembler.SelectFolder",
                 "title": "Select Folder",
-                "category": "Compiler Explorer",
+                "category": "Wingsemi Assembler",
                 "icon": "$(folder)"
             }
         ],
         "menus": {
             "view/title": [
                 {
-                    "command": "compiler-explorer.CompileAll",
-                    "when": "view == compiler-explorer.view",
+                    "command": "wingsemi-assembler.CompileAll",
+                    "when": "view == wingsemi-assembler.view",
                     "group": "navigation@1"
                 },
                 {
-                    "command": "compiler-explorer.AddSingleInstance",
-                    "when": "view == compiler-explorer.view",
+                    "command": "wingsemi-assembler.AddSingleInstance",
+                    "when": "view == wingsemi-assembler.view",
                     "group": "navigation@2"
                 },
                 {
-                    "command": "compiler-explorer.GetLink",
-                    "when": "view == compiler-explorer.view",
-                    "group": "navigation@3"
+                    "command": "wingsemi-assembler.AddMultiInstance",
+                    "when": "view == wingsemi-assembler.view"
                 },
                 {
-                    "command": "compiler-explorer.AddMultiInstance",
-                    "when": "view == compiler-explorer.view"
-                },
-                {
-                    "command": "compiler-explorer.LoadLink",
-                    "when": "view == compiler-explorer.view"
-                },
-                {
-                    "command": "compiler-explorer.RemoveAll",
-                    "when": "view == compiler-explorer.view"
-                },
-                {
-                    "command": "compiler-explorer.Clear",
-                    "when": "view == compiler-explorer.view"
+                    "command": "wingsemi-assembler.RemoveAll",
+                    "when": "view == wingsemi-assembler.view"
                 }
             ],
             "view/item/context": [
                 {
-                    "command": "compiler-explorer.Compile",
-                    "when": "view == compiler-explorer.view && viewItem == instance",
+                    "command": "wingsemi-assembler.Compile",
+                    "when": "view == wingsemi-assembler.view && viewItem == instance",
                     "group": "inline@1"
                 },
                 {
-                    "command": "compiler-explorer.Clone",
-                    "when": "view == compiler-explorer.view && viewItem == instance",
+                    "command": "wingsemi-assembler.Clone",
+                    "when": "view == wingsemi-assembler.view && viewItem == instance",
                     "group": "inline@2"
                 },
                 {
-                    "command": "compiler-explorer.Remove",
-                    "when": "view == compiler-explorer.view && viewItem == instance",
+                    "command": "wingsemi-assembler.Remove",
+                    "when": "view == wingsemi-assembler.view && viewItem == instance",
                     "group": "inline@3"
                 },
                 {
-                    "command": "compiler-explorer.SelectCompiler",
-                    "when": "view == compiler-explorer.view && viewItem == select",
+                    "command": "wingsemi-assembler.SelectCompiler",
+                    "when": "view == wingsemi-assembler.view && viewItem == select",
                     "group": "inline"
                 },
                 {
-                    "command": "compiler-explorer.GetInput",
-                    "when": "view == compiler-explorer.view && viewItem == text",
+                    "command": "wingsemi-assembler.GetInput",
+                    "when": "view == wingsemi-assembler.view && viewItem == text",
                     "group": "inline@1"
                 },
                 {
-                    "command": "compiler-explorer.ClearInput",
-                    "when": "view == compiler-explorer.view && viewItem == text",
+                    "command": "wingsemi-assembler.ClearInput",
+                    "when": "view == wingsemi-assembler.view && viewItem == text",
                     "group": "inline@2"
                 },
                 {
-                    "command": "compiler-explorer.OpenTempFile",
-                    "when": "view == compiler-explorer.view && viewItem == text"
+                    "command": "wingsemi-assembler.OpenTempFile",
+                    "when": "view == wingsemi-assembler.view && viewItem == text"
                 },
                 {
-                    "command": "compiler-explorer.SelectFile",
-                    "when": "view == compiler-explorer.view && viewItem == text"
+                    "command": "wingsemi-assembler.SelectFile",
+                    "when": "view == wingsemi-assembler.view && viewItem == text"
                 },
                 {
-                    "command": "compiler-explorer.CopyText",
-                    "when": "view == compiler-explorer.view && (viewItem == select || viewItem == text)"
+                    "command": "wingsemi-assembler.CopyText",
+                    "when": "view == wingsemi-assembler.view && (viewItem == select || viewItem == text)"
                 },
                 {
-                    "command": "compiler-explorer.SelectFile",
-                    "when": "view == compiler-explorer.view && viewItem == file",
+                    "command": "wingsemi-assembler.SelectFile",
+                    "when": "view == wingsemi-assembler.view && viewItem == file",
                     "group": "inline@1"
                 },
                 {
-                    "command": "compiler-explorer.SelectFolder",
-                    "when": "view == compiler-explorer.view && viewItem == folder",
+                    "command": "wingsemi-assembler.SelectFolder",
+                    "when": "view == wingsemi-assembler.view && viewItem == folder",
                     "group": "inline@1"
                 }
             ]
         },
         "configuration": [
             {
-                "title": "Compiler-Explorer",
+                "title": "Wingsemi-Assembler",
                 "properties": {
-                    "compiler-explorer.default.options": {
+                    "wingsemi-assembler.default.options": {
                         "type": "object",
                         "description": "The default compiler configuration",
                         "default": {
-                            "compiler": "x86-64 gcc 13.2",
+                            "compiler": "gdefault",
                             "language": "c++",
                             "options": "-std=c++17",
                             "input": "active",
@@ -266,7 +235,7 @@
                             }
                         }
                     },
-                    "compiler-explorer.default.color": {
+                    "wingsemi-assembler.default.color": {
                         "type": "object",
                         "description": "The default color configuration",
                         "default": {
@@ -279,7 +248,7 @@
                             "operator": "#ABB2BF"
                         }
                     },
-                    "compiler-explorer.default.url": {
+                    "wingsemi-assembler.default.url": {
                         "type": "string",
                         "description": "The default compiler explorer url",
                         "default": ""
@@ -298,6 +267,7 @@
         "webpack": "webpack --mode development",
         "webpack-dev": "webpack --mode development --watch",
         "package": "webpack --mode production --devtool hidden-source-map",
+        "package:vsce":"vsce package",
         "test-compile": "tsc -p ./",
         "compile-tests": "tsc -p . --outDir out",
         "watch-tests": "tsc -p . -w --outDir out",

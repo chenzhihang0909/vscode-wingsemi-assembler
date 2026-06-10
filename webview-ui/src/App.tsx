@@ -66,7 +66,7 @@ function App() {
   }, [fontSize]);
 
   const asmText2html = (text: string) => highlight(text);
-  const consoleText2html = (text: string) => `<span class="compiler-explorer-output">${ansiUp.ansi_to_html(text)}</span>`;
+  const consoleText2html = (text: string) => `<span class="wingsemi-assembler-output">${ansiUp.ansi_to_html(text)}</span>`;
 
   const consoleOutput = (() => {
     const result: { html: string, lineNo: number | null }[] = [];
@@ -92,7 +92,7 @@ function App() {
     return result;
   })();
 
-  const asmRes = (response?.compileResult.result?.asm || response?.compileResult.asm)?.map(x => ({ html: asmText2html(x.text), lineNo: x.source?.line }));
+  const asmRes = ((response?.compileResult.result?.asm || response?.compileResult.asm))?.map(x => ({ html: asmText2html(x.text), lineNo: x.source?.line }));
   const execStdoutRes = (response?.executeResult?.execResult || response?.executeResult)?.stdout?.map(x => ({ html: consoleText2html(x.text) }));
 
 
@@ -110,10 +110,10 @@ function App() {
   }
 
   return (<>
-    <VSCodePanels id="view" aria-label='Compiler Explorer' activeidChanged={(_, newValue) => activeId.current = newValue} style={{ height: '100vh' }}>
-      {/* <VSCodePanelTab id='stderr' className='compiler-explorer-output'>Console</VSCodePanelTab> */}
-      <VSCodePanelTab id='asm' className='compiler-explorer-output'>ASM</VSCodePanelTab>
-      {/* <VSCodePanelTab id='exeout' className='compiler-explorer-output'>Stdout</VSCodePanelTab> */}
+    <VSCodePanels id="view" aria-label='Wingsemi Assembler' activeidChanged={(_, newValue) => activeId.current = newValue} style={{ height: '100vh' }}>
+      {/* <VSCodePanelTab id='stderr' className='wingsemi-assembler-output'>Console</VSCodePanelTab> */}
+      <VSCodePanelTab id='asm' className='wingsemi-assembler-output'>ASM</VSCodePanelTab>
+      {/* <VSCodePanelTab id='exeout' className='wingsemi-assembler-output'>Stdout</VSCodePanelTab> */}
       <VSCodePanelView id='stderr'>
         <ResultViewer results={consoleOutput} onSelect={onSelect} text2html={consoleText2html} ref={f => gotoLine.current.stderr = f} />
       </VSCodePanelView>

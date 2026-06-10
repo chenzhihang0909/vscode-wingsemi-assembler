@@ -12,8 +12,10 @@ let provider: TreeViewProvider;
 let treeView: vscode.TreeView<TreeNode>;
 
 export async function Register(context: vscode.ExtensionContext) {
-    provider = await TreeViewProvider.create();
-    treeView = vscode.window.createTreeView("compiler-explorer.view", { treeDataProvider: provider });
+    // 关键：去掉 await，同步创建
+    provider = TreeViewProvider.create();
+
+    treeView = vscode.window.createTreeView("wingsemi-assembler.view", { treeDataProvider: provider });
 
     // checkbox api is available since vscode 1.80.0
     // if the version is lower than 1.80.0, use command to toggle checkbox
@@ -26,7 +28,7 @@ export async function Register(context: vscode.ExtensionContext) {
             provider.refresh();
         });
     } else {
-        vscode.commands.registerCommand("compiler-explorer.toggleCheckbox", async (node: TreeNode) => {
+        vscode.commands.registerCommand("wingsemi-assembler.toggleCheckbox", async (node: TreeNode) => {
             const { attr, instance } = node;
             //@ts-ignore
             instance.filters[attr] = !instance.filters[attr];
@@ -68,17 +70,17 @@ async function Resolve(context: vscode.ExtensionContext, instance: CompilerInsta
  * see that "menus": "view/title" in package.json
  */
 function RegisterView(context: vscode.ExtensionContext) {
-    const AddSingleInstance = vscode.commands.registerCommand("compiler-explorer.AddSingleInstance", async () => {
+    const AddSingleInstance = vscode.commands.registerCommand("wingsemi-assembler.AddSingleInstance", async () => {
         provider.instances.push(await SingleFileInstance.create());
         provider.refresh();
     });
 
-    const AddMultiInstance = vscode.commands.registerCommand("compiler-explorer.AddMultiInstance", async () => {
+    const AddMultiInstance = vscode.commands.registerCommand("wingsemi-assembler.AddMultiInstance", async () => {
         provider.instances.push(await MultiFileInstance.create());
         provider.refresh();
     });
 
-    const CompileAll = vscode.commands.registerCommand("compiler-explorer.CompileAll", async () => {
+    const CompileAll = vscode.commands.registerCommand("wingsemi-assembler.CompileAll", async () => {
         const instances = provider.instances;
         try {
             const compilePromises = instances.map(async (instance) => {
@@ -90,42 +92,42 @@ function RegisterView(context: vscode.ExtensionContext) {
         }
     });
 
-    const GetLink = vscode.commands.registerCommand("compiler-explorer.GetLink", async () => {
-        const instances = provider.instances;
-        const link = await GetShortLink(instances);
-        vscode.env.clipboard.writeText(link);
-        logger.info(`The link has been copied to the clipboard: "${link}"`);
-    });
+    // const GetLink = vscode.commands.registerCommand("wingsemi-assembler.GetLink", async () => {
+    //     const instances = provider.instances;
+    //     const link = await GetShortLink(instances);
+    //     vscode.env.clipboard.writeText(link);
+    //     logger.info(`The link has been copied to the clipboard: "${link}"`);
+    // });
 
-    const LoadLink = vscode.commands.registerCommand("compiler-explorer.LoadLink", async () => {
-        const link = await vscode.window.showInputBox({ placeHolder: "Enter link" });
-        if (link) {
-            try {
-                const instances = await LoadShortLink(link);
-                provider.instances = instances;
-                provider.refresh();
-            } catch (error: unknown) {
-                logger.error(`Load link failed while load link, error: ${error}`);
-            }
-        }
-    });
+    // const LoadLink = vscode.commands.registerCommand("wingsemi-assembler.LoadLink", async () => {
+    //     const link = await vscode.window.showInputBox({ placeHolder: "Enter link" });
+    //     if (link) {
+    //         try {
+    //             const instances = await LoadShortLink(link);
+    //             provider.instances = instances;
+    //             provider.refresh();
+    //         } catch (error: unknown) {
+    //             logger.error(`Load link failed while load link, error: ${error}`);
+    //         }
+    //     }
+    // });
 
-    const RemoveAll = vscode.commands.registerCommand("compiler-explorer.RemoveAll", async () => {
+    const RemoveAll = vscode.commands.registerCommand("wingsemi-assembler.RemoveAll", async () => {
         provider.instances = [];
         provider.refresh();
     });
 
-    const Clear = vscode.commands.registerCommand("compiler-explorer.Clear", async () => {
-        WebviewPanel.clear();
-    });
+    // const Clear = vscode.commands.registerCommand("wingsemi-assembler.Clear", async () => {
+    //     WebviewPanel.clear();
+    // });
 
     context.subscriptions.push(AddSingleInstance);
     context.subscriptions.push(CompileAll);
-    context.subscriptions.push(GetLink);
+    // context.subscriptions.push(GetLink);
     context.subscriptions.push(AddMultiInstance);
-    context.subscriptions.push(LoadLink);
+    // context.subscriptions.push(LoadLink);
     context.subscriptions.push(RemoveAll);
-    context.subscriptions.push(Clear);
+    // context.subscriptions.push(Clear);
 }
 
 /**
@@ -133,7 +135,7 @@ function RegisterView(context: vscode.ExtensionContext) {
  * see that "menus": "view/item/context", "when": viewItem == instance, in package.json
  */
 function RegisterInstance(context: vscode.ExtensionContext) {
-    const Compile_ = vscode.commands.registerCommand("compiler-explorer.Compile", async (node: TreeNode) => {
+    const Compile_ = vscode.commands.registerCommand("wingsemi-assembler.Compile", async (node: TreeNode) => {
         const instance = node.instance as CompilerInstance;
         try {
             await Resolve(context, instance);
@@ -144,13 +146,13 @@ function RegisterInstance(context: vscode.ExtensionContext) {
         }
     });
 
-    const Clone = vscode.commands.registerCommand("compiler-explorer.Clone", async (node: TreeNode) => {
+    const Clone = vscode.commands.registerCommand("wingsemi-assembler.Clone", async (node: TreeNode) => {
         const instance = node.instance as CompilerInstance;
         provider.instances.push(instance.copy());
         provider.refresh();
     });
 
-    const Remove = vscode.commands.registerCommand("compiler-explorer.Remove", async (node: TreeNode) => {
+    const Remove = vscode.commands.registerCommand("wingsemi-assembler.Remove", async (node: TreeNode) => {
         const index = provider.instances.indexOf(node.instance as CompilerInstance);
         provider.instances.splice(index, 1);
         provider.refresh();
@@ -166,7 +168,7 @@ function RegisterInstance(context: vscode.ExtensionContext) {
  */
 function RegisterSelect(context: vscode.ExtensionContext) {
     const SelectCompiler = vscode.commands.registerCommand(
-        "compiler-explorer.SelectCompiler",
+        "wingsemi-assembler.SelectCompiler",
         async (node: TreeNode) => {
             const infos = await GetCompilerInfos();
             const options = Array.from(infos.keys()).map((name) => ({ label: name }));
@@ -191,7 +193,7 @@ function RegisterSelect(context: vscode.ExtensionContext) {
  * see that "menus": "view/item/context", "when": viewItem == text, in package.json
  */
 function RegisterText(context: vscode.ExtensionContext) {
-    const GetInput = vscode.commands.registerCommand("compiler-explorer.GetInput", async (node: TreeNode) => {
+    const GetInput = vscode.commands.registerCommand("wingsemi-assembler.GetInput", async (node: TreeNode) => {
         const { attr, instance } = node;
         //@ts-ignore
         const last = instance[attr].value as string;
@@ -207,18 +209,18 @@ function RegisterText(context: vscode.ExtensionContext) {
         }
     });
 
-    const ClearInput = vscode.commands.registerCommand("compiler-explorer.ClearInput", async (node: TreeNode) => {
+    const ClearInput = vscode.commands.registerCommand("wingsemi-assembler.ClearInput", async (node: TreeNode) => {
         const { attr, instance } = node;
         //@ts-ignore
         instance[attr].value = "";
         provider.refresh();
     });
 
-    const CopyText = vscode.commands.registerCommand("compiler-explorer.CopyText", async (node: TreeNode) => {
+    const CopyText = vscode.commands.registerCommand("wingsemi-assembler.CopyText", async (node: TreeNode) => {
         vscode.env.clipboard.writeText(node.label as string);
     });
 
-    const OpenTempFile = vscode.commands.registerCommand("compiler-explorer.OpenTempFile", async (node: TreeNode) => {
+    const OpenTempFile = vscode.commands.registerCommand("wingsemi-assembler.OpenTempFile", async (node: TreeNode) => {
         const { attr, instance, context } = node;
         if (context === "text") {
             //@ts-ignore
@@ -245,7 +247,7 @@ function RegisterText(context: vscode.ExtensionContext) {
  * Register commands for the item, see that "menus": "view/item/context" in package.json
  */
 function RegisterItem(context: vscode.ExtensionContext) {
-    const SelectFile = vscode.commands.registerCommand("compiler-explorer.SelectFile", async (node: TreeNode) => {
+    const SelectFile = vscode.commands.registerCommand("wingsemi-assembler.SelectFile", async (node: TreeNode) => {
         const uri = await vscode.window.showOpenDialog({
             canSelectMany: false,
             canSelectFiles: true,
@@ -265,7 +267,7 @@ function RegisterItem(context: vscode.ExtensionContext) {
         }
     });
 
-    const SelectFolder = vscode.commands.registerCommand("compiler-explorer.SelectFolder", async (node: TreeNode) => {
+    const SelectFolder = vscode.commands.registerCommand("wingsemi-assembler.SelectFolder", async (node: TreeNode) => {
         const uri = await vscode.window.showOpenDialog({
             canSelectFolders: true,
             canSelectFiles: false,

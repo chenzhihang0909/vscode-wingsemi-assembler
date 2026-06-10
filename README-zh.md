@@ -1,8 +1,8 @@
-# Compiler Explorer for VSCode
+# Wingsemi Assembler for VSCode
 
 [English](./README.md) | [中文](./README-zh.md)
 
-[Compiler Explorer](https://github.com/compiler-explorer/compiler-explorer) 是一款流行的在线 C++ 编译器，它支持各种平台，各种不同的编译器版本。不仅可以查看执行结果，还可以查看编译器生成的汇编代码。本插件基于 Compiler Explorer 提供的 [API](https://github.com/compiler-explorer/compiler-explorer/blob/main/docs/API.md) 将它集成到 VSCode 中，使得用户可以在 VSCode 中直接使用 Compiler Explorer 的功能。
+[Wingsemi Assembler](https://github.com/wingsemi-assembler/wingsemi-assembler) 是一款流行的在线 C++ 编译器，它支持各种平台，各种不同的编译器版本。不仅可以查看执行结果，还可以查看编译器生成的汇编代码。本插件基于 Wingsemi Assembler 提供的 [API](https://github.com/wingsemi-assembler/wingsemi-assembler/blob/main/docs/API.md) 将它集成到 VSCode 中，使得用户可以在 VSCode 中直接使用 Wingsemi Assembler 的功能。
 
 ## 效果展示
 
@@ -55,9 +55,9 @@
 注意，由于多文件编译需要把所有用到的文件都上传到服务器，所以我们默认会读取你指定的目录下的所有文件（无论后缀名），**所以目前请不要指定文件数量过多的文件夹**。之后可能会添加一些选项允许用户过滤掉一些文件，但是目前还没有。
 
 ## 一些用户设置
-`compiler-explorer.default.options`：使用`+`号创建编译器时的默认参数
+`wingsemi-assembler.default.options`：使用`+`号创建编译器时的默认参数
 ```json
-"compiler-explorer.default.options": {
+"wingsemi-assembler.default.options": {
   "type": "object",
   "description": "The default compiler configuration",
   "default": {
@@ -85,9 +85,9 @@
 }
 ```
 
-`compiler-explorer.default.color`：用于指定高亮汇编代码时的颜色
+`wingsemi-assembler.default.color`：用于指定高亮汇编代码时的颜色
 ```json
-"compiler-explorer.default.color":{
+"wingsemi-assembler.default.color":{
     "symbol": "#61AFEF",
     "string": "#98C379",
     "number": "#D19A66",
@@ -97,14 +97,14 @@
     "operator": "#ABB2BF"
 }
 ```
-`compiler-explorer.default.url`：用于打开插件时默认加载的链接，默认是空
+`wingsemi-assembler.default.url`：用于打开插件时默认加载的链接，默认是空
 ```json
-"compiler-explorer.default.url": {
+"wingsemi-assembler.default.url": {
   "default": ""
 }
 ```
 
 ## 问题反馈
-该插件还处于早期阶段，如果你在使用过程中遇到了问题，或者有任何建议，欢迎在 [GitHub](https://github.com/16bit-ykiko/vscode-compiler-explorer) 上留言讨论。或者添加 QQ 群：`662499937` 交流。另外 Output 窗口可能会提供一些有用的信息
+该插件还处于早期阶段，如果你在使用过程中遇到了问题，或者有任何建议，欢迎在 [GitHub](https://github.com/16bit-ykiko/vscode-wingsemi-assembler) 上留言讨论。或者添加 QQ 群：`662499937` 交流。另外 Output 窗口可能会提供一些有用的信息
 
 ![Output](docs/Output.png)

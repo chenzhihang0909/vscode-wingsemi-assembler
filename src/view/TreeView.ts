@@ -146,7 +146,7 @@ export class TreeItem implements vscode.TreeItem {
                 this.iconPath = value ? trueIcon : falseIcon;
                 this.command = {
                     title: "Toggle",
-                    command: "compiler-explorer.toggleCheckbox",
+                    command: "wingsemi-assembler.toggleCheckbox",
                     arguments: [node],
                 };
             }
@@ -160,15 +160,24 @@ export class TreeViewProvider implements vscode.TreeDataProvider<TreeNode> {
 
     instances: CompilerInstance[] = [];
 
-    static async create() {
-        const provider = new TreeViewProvider();
-        const url = Config.defaultURL();
-        if (url !== "") {
-            provider.instances = await LoadShortLink(Config.defaultURL());
-        } else {
-            provider.instances.push(await SingleFileInstance.create());
-        }
-        return provider;
+    // 关键：改成同步创建
+    static create() {
+        return new TreeViewProvider();
+    }
+
+    // 给外部调用
+    defaultURL() {
+        return Config.defaultURL();
+    }
+
+    // 给外部调用
+    async loadShortLink(url: string) {
+        return await LoadShortLink(url);
+    }
+
+    // 给外部调用
+    async createSingleFileInstance() {
+        return await SingleFileInstance.create();
     }
 
     refresh(): void {

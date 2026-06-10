@@ -16,9 +16,27 @@ interface API {
 export async function activate(context: vscode.ExtensionContext) {
     initLogger();
     SetProxy();
+
+    // 同步注册，不等待
     const { provider, treeView } = await Register(context);
-    const panels = WebviewPanel.panels;
-    return { provider, treeView, context, panels };
+
+    // 数据异步后台加载，不阻塞视图
+    (async () => {
+        try {
+            const url = provider.defaultURL();
+            if (url !== "") {
+                provider.instances = await provider.loadShortLink(url);
+            } else {
+                provider.instances.push(await provider.createSingleFileInstance());
+            }
+        } catch (err) {
+            console.error("初始化实例失败", err);
+        }
+
+        provider.refresh();
+    })();
+
+    return { provider, treeView, context, panels: WebviewPanel.panels };
 }
 
 export function deactivate() {

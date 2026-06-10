@@ -117,7 +117,7 @@ export class ClientState {
 
         // FIXME:
         // Missing compilers for normal editors when tree editor is present.
-        // See [issue 6380](https://github.com/compiler-explorer/compiler-explorer/issues/6380)
+        // See [issue 6380](https://github.com/wingsemi-assembler/wingsemi-assembler/issues/6380)
 
         for (const instance of instances) {
             if (instance instanceof SingleFileInstance) {
@@ -135,7 +135,7 @@ export class ClientState {
         }
 
         // FIXME:
-        // Currently, the Compiler Explorer only supports a single TreeEditor instance, which might change in the future.
+        // Currently, the Wingsemi Assembler only supports a single TreeEditor instance, which might change in the future.
         // So, at the moment, we only consider the case that there is only one tree.
 
         const multis = instances.filter((instance) => instance instanceof MultiFileInstance);
@@ -170,7 +170,7 @@ export class ClientState {
         }
 
         // FIXME:
-        // Currently, the Compiler Explorer only supports a single TreeEditor instance, which might change in the future.
+        // Currently, the Wingsemi Assembler only supports a single TreeEditor instance, which might change in the future.
         // So, at the moment, we only consider the case that there is only one tree.
 
         if (this.trees.length > 0) {

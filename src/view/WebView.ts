@@ -21,8 +21,8 @@ export class WebviewPanel {
         const active = vscode.window.activeTextEditor;
 
         const panel = vscode.window.createWebviewPanel(
-            "compiler-explorer-webview",
-            "Compiler Explorer",
+            "wingsemi-assembler-webview",
+            "Wingsemi Assembler",
             vscode.ViewColumn.Beside,
             { enableScripts: true, enableFindWidget: true, retainContextWhenHidden: true }
         );
@@ -93,7 +93,7 @@ function getWebviewHtml(extensionPath: string, panel: vscode.WebviewPanel): stri
 
     let colorStyle = "";
     for (const [key, value] of Object.entries(Config.defaultColor())) {
-        colorStyle += `.compiler-explorer-${key} { 
+        colorStyle += `.wingsemi-assembler-${key} { 
             color: ${value}; 
             font-family: var(--vscode-editor-font-family);
             font-size: var(--vscode-editor-font-size); 
@@ -104,7 +104,7 @@ function getWebviewHtml(extensionPath: string, panel: vscode.WebviewPanel): stri
     <html lang="en">
         <head>
             <style> 
-                .compiler-explorer-output {
+                .wingsemi-assembler-output {
                     font-family: var(--vscode-editor-font-family);
                     font-size: var(--vscode-editor-font-size);
                 }

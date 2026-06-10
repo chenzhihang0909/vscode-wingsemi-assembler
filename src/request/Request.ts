@@ -11,7 +11,7 @@ export async function Compile(instance: CompilerInstance): Promise<Response> {
     const request = await CompileRequest.from(instance);
     const headers = { "Content-Type": "application/json; charset=utf-8" };
     const suffix = instance instanceof SingleFileInstance ? "/compile" : "/cmake";
-    const url = `https://godbolt.org/api/compiler/${instance.compilerInfo.id}${suffix}`;
+    const url = `http://127.0.0.1:10240/api/compiler/${instance.compilerInfo.id}${suffix}`;
 
     return retry("Compiling", async () => {
         logger.info(`Request for Compile from "${url}"`);
@@ -25,14 +25,14 @@ export async function Compile(instance: CompilerInstance): Promise<Response> {
             return { compileResult: compileResult.data, executeResult: executeResult.data };
         }
 
-        return { compileResult: compileResult.data };
+        return { compileResult: compileResult.data.result };
     });
 }
 
 export async function GetShortLink(instances: CompilerInstance[]): Promise<string> {
     const request = await ClientState.from(instances);
     const headers = { "Content-Type": "application/json; charset=utf-8" };
-    const url = "https://godbolt.org/api/shortener";
+    const url = "http://127.0.0.1:10240/api/shortener";
 
     return retry("Get Short Link", async () => {
         logger.info(`Request for short link from "${url}"`);
@@ -42,7 +42,7 @@ export async function GetShortLink(instances: CompilerInstance[]): Promise<strin
 }
 
 export async function LoadShortLink(link: string): Promise<CompilerInstance[]> {
-    const url = "https://godbolt.org/api/shortlinkinfo/" + link.split("/").pop();
+    const url = "http://127.0.0.1:10240/api/shortlinkinfo/" + link.split("/").pop();
 
     return retry("Loading ShortLink", async () => {
         logger.info(`Request for short link info from "${url}"`);
