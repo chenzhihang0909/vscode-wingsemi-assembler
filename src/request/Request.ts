@@ -5,13 +5,14 @@ import { retry } from "./Utility";
 import { Response } from "./CompileResult";
 import { ClientState } from "./ClientState";
 import { CompileRequest } from "./CompileRequest";
-import { CompilerInstance, SingleFileInstance } from "../view/Instance";
+import { CompilerInstance } from "../view/Instance";
 
-export async function Compile(instance: CompilerInstance): Promise<Response> {
+export async function Compile(instance: any): Promise<Response> {
     const request = await CompileRequest.from(instance);
+    logger.info(`Compile request: ${JSON.stringify(request)}`);
     const headers = { "Content-Type": "application/json; charset=utf-8" };
-    const suffix = instance instanceof SingleFileInstance ? "/compile" : "/cmake";
-    const url = `http://127.0.0.1:10240/api/compiler/${instance.compilerInfo.id}${suffix}`;
+    const suffix =  "/cmake";
+    const url = `http://127.0.0.1:10240/api/compiler/riscv-clang${suffix}`;
 
     return retry("Compiling", async () => {
         logger.info(`Request for Compile from "${url}"`);

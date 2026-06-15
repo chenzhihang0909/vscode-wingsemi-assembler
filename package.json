@@ -15,17 +15,13 @@
     "categories": [
         "Other"
     ],
-    "activationEvents": ["onStartupFinished"],
+    "activationEvents": [
+        "onStartupFinished"
+    ],
     "main": "./dist/extension.js",
     "contributes": {
         "viewsContainers": {
-            "activitybar": [
-                {
-                    "id": "wingsemi-assembler",
-                    "title": "Wingsemi Assembler",
-                    "icon": "resources/icon.svg"
-                }
-            ]
+            
         },
         "viewsWelcome": [
             {
@@ -201,6 +197,13 @@
                     "when": "view == wingsemi-assembler.view && viewItem == folder",
                     "group": "inline@1"
                 }
+            ],
+            "editor/context": [
+                {
+                    "command": "wingsemi-assembler.Compile",
+                    "when": "editorTextFocus && editorLangId == c",
+                    "group": "z_commands"
+                }
             ]
         },
         "configuration": [
@@ -267,7 +270,7 @@
         "webpack": "webpack --mode development",
         "webpack-dev": "webpack --mode development --watch",
         "package": "webpack --mode production --devtool hidden-source-map",
-        "package:vsce":"vsce package",
+        "package:vsce": "vsce package",
         "test-compile": "tsc -p ./",
         "compile-tests": "tsc -p . --outDir out",
         "watch-tests": "tsc -p . -w --outDir out",
@@ -278,7 +281,7 @@
     "devDependencies": {
         "@types/lodash": "^4.17.0",
         "@types/mocha": "^10.0.6",
-        "@types/node": "18.x",
+        "@types/node": "^18.19.130",
         "@types/vscode": "^1.65.0",
         "@typescript-eslint/eslint-plugin": "^7.4.0",
         "@typescript-eslint/parser": "^7.4.0",

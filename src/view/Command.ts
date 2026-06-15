@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-
+import * as fs from 'fs/promises';
 import { logger } from "../request/Logger";
 import { WebviewPanel } from "./WebView";
 import { GetEditor, WriteFile } from "../request/Utility";
@@ -7,7 +7,8 @@ import { TreeViewProvider, TreeNode } from "./TreeView";
 import { GetCompilerInfos, QueryCompilerInfo } from "../request/CompilerInfo";
 import { Compile, GetShortLink, LoadShortLink } from "../request/Request";
 import { CompilerInstance, SingleFileInstance, MultiFileInstance } from "./Instance";
-
+import * as path from 'path';
+import makeToCMake from "./convent";
 let provider: TreeViewProvider;
 let treeView: vscode.TreeView<TreeNode>;
 
@@ -47,22 +48,22 @@ export async function Register(context: vscode.ExtensionContext) {
     return { provider, treeView };
 }
 
-async function Resolve(context: vscode.ExtensionContext, instance: CompilerInstance) {
-    if (instance.output === "webview") {
-        const editor = instance instanceof SingleFileInstance ? GetEditor(instance.input) : GetEditor("active");
+async function Resolve(context: vscode.ExtensionContext, fromStudio: any) {
+    // if (instance.output === "webview") {
+        const editor = GetEditor("active");
         const panel = new WebviewPanel({ context, editor });
 
         while (!panel.ready) {
             await new Promise((resolve) => setTimeout(resolve, 100));
         }
 
-        const result = await Compile(instance);
+        const result = await Compile(fromStudio);
         panel.postMessage(result);
-    } else {
-        const result = await Compile(instance);
-        const asm = result?.compileResult?.asm?.map((asm) => asm.text).join("\n") || "";
-        WriteFile(instance.output, asm);
-    }
+    // } else {
+    //     const result = await Compile(instance);
+    //     const asm = result?.compileResult?.asm?.map((asm) => asm.text).join("\n") || "";
+    //     WriteFile(instance.output, asm);
+    // }
 }
 
 /**
@@ -135,13 +136,49 @@ function RegisterView(context: vscode.ExtensionContext) {
  * see that "menus": "view/item/context", "when": viewItem == instance, in package.json
  */
 function RegisterInstance(context: vscode.ExtensionContext) {
-    const Compile_ = vscode.commands.registerCommand("wingsemi-assembler.Compile", async (node: TreeNode) => {
-        const instance = node.instance as CompilerInstance;
+    const Compile_ = vscode.commands.registerCommand("wingsemi-assembler.Compile", async (fromStudio:any) => {
         try {
-            await Resolve(context, instance);
+            logger.info(fromStudio)
+            
+            // 获取makefile信息
+            const workspaceRoot = vscode.workspace.workspaceFolders![0].uri.fsPath;
+            logger.info(workspaceRoot)
+            const activeFile =vscode.Uri.parse(fromStudio).fsPath.replace(workspaceRoot, "")
+            logger.info(activeFile)
+            const folderName = activeFile.replace(/[\\/]/g, "/").replace(/^\/+/, "").split("/")[0] || "";
+            const makefilePath = path.join(workspaceRoot,folderName, 'output', 'makefile');
+            const projectSettingPath = path.join(workspaceRoot,folderName, 'config', 'setting.json');
+            let makefileJsonContent = '';
+            let projectSettingJsonContent:any = {};
+            let CorePath = '';
+            try {
+                const makefileContent = await fs.readFile(makefilePath, 'utf8');
+                makefileJsonContent =  makefileContent.toString()
+                const projectSettingContent = await fs.readFile(projectSettingPath, 'utf8');
+                projectSettingJsonContent = JSON.parse(projectSettingContent);
+                if(projectSettingJsonContent['Core']){
+                    CorePath = projectSettingJsonContent['Core'].path;
+                }else{
+                    throw new Error('Invalid project setting file: missing "Core" field');
+                }
+            }catch(err){
+                logger.error(`Failed to read makefile, error: ${(err as Error).message}`);
+                return
+            }
+            
+            logger.info(activeFile)
+            logger.info(workspaceRoot)
+            logger.info(folderName)
+            // logger.info(makefileJsonContent)
+            // logger.info(makeToCMake(makefileJsonContent))
+            // 获取clang信息
+            await Resolve(context, {compilerInfo:{id:'riscv-clang',
+                objdumper:path.join(CorePath,'llvm','bin','llvm-objdump'),
+                exe:path.join(CorePath,'llvm','bin','clang')
+            }, src: {src:path.join(workspaceRoot,folderName),cmakeSource: makeToCMake(makefileJsonContent)}});
         } catch (error: unknown) {
             logger.error(
-                `Compile failed while compile for ${instance.compilerInfo?.name}, error: ${(error as Error).message}`
+                `error: ${(error as Error).message}`
             );
         }
     });

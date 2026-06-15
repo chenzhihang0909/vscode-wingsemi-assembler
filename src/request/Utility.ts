@@ -100,15 +100,15 @@ export async function ReadText(text: Text) {
     }
 }
 
-export async function ReadCMakeSource(src: string) {
+export async function ReadCMakeSource(src: any) {
     let cmakeSource = "";
     let files: { filename: string; contents: string }[] = [];
 
-    const cmake = path.join(src, "CMakeLists.txt");
-    if (existsSync(cmake)) {
-        cmakeSource = await ReadSource(cmake);
-        for (const filename of await readdir(src, { recursive: true })) {
-            const fullname = path.join(src, filename);
+    // const cmake = path.join(src, "CMakeLists.txt");
+    // if (existsSync(cmake)) {
+        cmakeSource = src.cmakeSource;
+        for (const filename of await readdir(src.src, { recursive: true })) {
+            const fullname = path.join(src.src, filename);
             const stats = await stat(fullname);
             if (stats.isFile()) {
 
@@ -125,9 +125,9 @@ export async function ReadCMakeSource(src: string) {
             }
         }
         return { cmakeSource, files };
-    } else {
-        throw Error(`CMakeLists.txt not found in ${src}`);
-    }
+    // } else {
+    //     throw Error(`CMakeLists.txt not found in ${src}`);
+    // }
 }
 
 async function CreateTempDir() {

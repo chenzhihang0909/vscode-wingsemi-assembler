@@ -60,23 +60,51 @@ export class CompileRequest {
         public source: string,
         public compiler: string,
         public bypassCache: number,
-        public options: CompileOptions,
+        public options: CompileOptions | any,
         public allowStoreCodeDebug: number,
         public files: { filename: string; contents: string }[]
-    ) {}
+    ) { }
 
-    static async from(instance: CompilerInstance) {
+    static async from(instance: any) {
         const compiler = instance.compilerInfo.id;
-        const options = await CompileOptions.from(instance);
+        // const options = await CompileOptions.from(instance);
 
-        if (instance instanceof SingleFileInstance) {
-            const source = await ReadSource(instance.input);
-            return new CompileRequest("c++", source, compiler, 0, options, 0, []);
-        } else if (instance instanceof MultiFileInstance) {
-            const { cmakeSource, files } = await ReadCMakeSource(instance.src);
-            return new CompileRequest("c++", cmakeSource, compiler, 0, options, 0, files);
-        }
+        // if (instance instanceof SingleFileInstance) {
+        //     const source = await ReadSource(instance.input);
+        //     return new CompileRequest("c++", source, compiler, 0, options, 0, []);
+        // } else if (instance instanceof MultiFileInstance) {
+        const { files, cmakeSource } = await ReadCMakeSource(instance.src);
+        return new CompileRequest("c++", cmakeSource, compiler, 0, {
+            compiler: {
+                objdumper: instance.compilerInfo.objdumper,
+                exe: instance.compilerInfo.exe
+            },
+            "filters": {
+                "skipASM": false,
+                "binaryObject": false,
+                "binary": false,
+                "execute": false,
+                "intel": true,
+                "demangle": false,
+                "labels": false,
+                "libraryCode": false,
+                "directives": false,
+                "commentOnly": false,
+                "trim": false,
+                "debugCalls": false
+            },
+            "userArguments": "-std=c++17",
+            "executeParameters": {
+                "args": [],
+                "stdin": ""
+            },
+            "compilerOptions": {
+                "cmakeArgs": "",
+                "customOutputFilename": "main"
+            }
+        }, 0, files);
+        // }
 
-        throw Error("Unknown instance type");
+        // throw Error("Unknown instance type");
     }
 }
