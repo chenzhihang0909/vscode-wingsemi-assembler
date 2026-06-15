@@ -83,7 +83,7 @@ function makeToCMake(makeContent:any) {
   // 拼接 CMake 文本
   const lines = [];
 
-  lines.push(`# 强制关闭编译器自检，适配交叉编译`);
+
   lines.push(`set(CMAKE_C_COMPILER_WORKS ON CACHE BOOL "" FORCE)`);
   lines.push(`set(CMAKE_C_COMPILER_FORCED ON)`);
   lines.push(`set(CMAKE_ASM_COMPILER_FORCED ON)`);
@@ -99,25 +99,25 @@ function makeToCMake(makeContent:any) {
   lines.push(`enable_language(ASM)`);
   lines.push('');
 
-  lines.push(`# 编译参数`);
+
   lines.push(`add_compile_options(`);
   cFlags.forEach((opt: string) => lines.push(`    ${opt}`));
   lines.push(`)`);
   lines.push('');
 
-  lines.push(`# 头文件路径`);
+
   lines.push(`include_directories(`);
   incPaths.forEach((p: string) => lines.push(`    ${p}`));
   lines.push(`)`);
   lines.push('');
 
   if (libDir) {
-    lines.push(`# 链接库目录`);
+
     lines.push(`link_directories(${libDir})`);
     lines.push('');
   }
 
-  lines.push(`# 链接参数`);
+
   lines.push(`add_link_options(`);
   ldFlags.forEach((opt: string) => lines.push(`    ${opt}`));
   if (ldScript) lines.push(`    -T ${ldScript}`);
@@ -126,7 +126,7 @@ function makeToCMake(makeContent:any) {
   lines.push(`)`);
   lines.push('');
 
-  lines.push(`# 递归收集源文件`);
+
   lines.push(`file(GLOB_RECURSE SOURCES`);
   srcDirs.forEach((d: any) => lines.push(`    \${PROJECT_SOURCE_DIR}/${d}/*.[cS]`));
   lines.push(`)`);
