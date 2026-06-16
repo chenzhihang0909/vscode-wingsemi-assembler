@@ -29,7 +29,7 @@ export class WebviewPanel {
 
         panel.iconPath = singleIcon;
         panel.webview.html = getWebviewHtml(context.extensionPath, panel);
-        panel.webview.onDidReceiveMessage((message) => {
+        panel.webview.onDidReceiveMessage(async (message) => {
             switch (message.command) {
                 case "ready":
                     {
@@ -37,20 +37,31 @@ export class WebviewPanel {
                     }
                     return;
                 case "gotoLine":
-                    {
-                        const lineNo = message.lineNo as number;
+                    const { file, lineNo } = message;
+                    try {
+                        // 1. 根据文件路径打开编辑器
+                        const uri = vscode.Uri.file(file);
+                        const editor = await vscode.window.showTextDocument(uri);
+
+                        // 2. 打开成功后，执行行号跳转逻辑
                         if (
                             lineNo < 0 ||
                             lineNo === editor.selection.active.line ||
                             lineNo >= editor.document.lineCount
                         ) {
-                            break;
+                            return;
                         }
+                        // 光标定位到行首
                         editor.selection = new vscode.Selection(lineNo, 0, lineNo, 0);
+                        // 滚动至屏幕中间
                         editor.revealRange(
                             new vscode.Range(lineNo, 0, lineNo, 0),
                             vscode.TextEditorRevealType.InCenter
                         );
+                    } catch (err) {
+                        // 文件不存在/路径错误捕获异常
+                        vscode.window.showErrorMessage(`无法打开文件：${file}`);
+                        console.error('打开文件失败', err);
                     }
                     return;
             }

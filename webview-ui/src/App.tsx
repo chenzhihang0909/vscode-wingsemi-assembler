@@ -25,7 +25,7 @@ function App() {
   const [response, setResponse] = useState<Response>();
 
   const activeId = useRef<string>('asm');
-  const gotoLine = useRef<{ [tabId: string]: null | ((lineNo: number) => void) }>({});
+  const gotoLine = useRef<{ [tabId: string]: null | ((lineNo: number, file: string) => void) }>({});
 
   const [sendMessage] = useVsCode(message => {
     switch (message.command) {
@@ -35,10 +35,10 @@ function App() {
         setResponse((message as SetResultsMsg).results);
       } break;
       case 'gotoLine': {
-        type GotoLineMsg = MessageBase & { lineNo: number };
+        type GotoLineMsg = MessageBase & { lineNo: number, file: string };
         const f = gotoLine.current[activeId.current];
         if (f) {
-          f((message as GotoLineMsg).lineNo);
+          f((message as GotoLineMsg).lineNo, (message as GotoLineMsg).file);
         }
       } break;
     }
@@ -92,13 +92,13 @@ function App() {
     return result;
   })();
 
-  const asmRes = ((response?.compileResult.result?.asm || response?.compileResult.asm))?.map(x => ({ html: asmText2html(x.text), lineNo: x.source?.line }));
+  const asmRes = ((response?.compileResult.result?.asm || response?.compileResult.asm))?.map(x => ({ html: asmText2html(x.text), lineNo: x.source?.line, file: x.source?.file }));
   const execStdoutRes = (response?.executeResult?.execResult || response?.executeResult)?.stdout?.map(x => ({ html: consoleText2html(x.text) }));
 
 
-  const onSelect = (line: number) => {
+  const onSelect = (line: number, file: string) => {
     // @ts-expect-error TODO: better type hint
-    sendMessage({ command: 'gotoLine', lineNo: line });
+    sendMessage({ command: 'gotoLine', lineNo: line, file });
   };
 
   if (isLoaded) {
@@ -114,15 +114,15 @@ function App() {
       {/* <VSCodePanelTab id='stderr' className='wingsemi-assembler-output'>Console</VSCodePanelTab> */}
       <VSCodePanelTab id='asm' className='wingsemi-assembler-output'>ASM</VSCodePanelTab>
       {/* <VSCodePanelTab id='exeout' className='wingsemi-assembler-output'>Stdout</VSCodePanelTab> */}
-      <VSCodePanelView id='stderr'>
+      {/* <VSCodePanelView id='stderr'>
         <ResultViewer results={consoleOutput} onSelect={onSelect} text2html={consoleText2html} ref={f => gotoLine.current.stderr = f} />
-      </VSCodePanelView>
+      </VSCodePanelView> */}
       <VSCodePanelView id='asm'>
         <ResultViewer results={asmRes} onSelect={onSelect} text2html={asmText2html} ref={f => gotoLine.current.asm = f} />
       </VSCodePanelView>
-      <VSCodePanelView id='stdout'>
+      {/* <VSCodePanelView id='stdout'>
         <ResultViewer results={execStdoutRes} onSelect={onSelect} text2html={consoleText2html} ref={f => gotoLine.current.exeout = f} />
-      </VSCodePanelView>
+      </VSCodePanelView> */}
     </VSCodePanels>
   </>);
 }

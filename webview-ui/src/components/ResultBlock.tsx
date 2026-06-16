@@ -23,7 +23,8 @@ const ToggleButton: FunctionComponent<ToggleButtonProps> = (props) => {
 export interface ResultBlockProps {
   html: string[];
   lineNo?: number;
-  onSelect?: (lineNo: number) => void;
+  file?: string;
+  onSelect?: (lineNo: number, file: string) => void;
 }
 
 export interface ResultBlockRef {
@@ -55,7 +56,7 @@ const ResultBlockImpl: ForwardRefRenderFunction<ResultBlockRef, ResultBlockProps
   return (<>
     <div
       ref={selfElement}
-      onClick={props.onSelect && (() => props.onSelect!(props.lineNo!))}
+      onClick={props.onSelect && (() => props.onSelect!(props.lineNo!, props.file!))}
       className={`result-block ${isSelected ? 'selected' : ''} ${isCollapsed ? 'collapsed' : ''}`}
     >
       {props.html.length > 1 && <ToggleButton isCollapsed={isCollapsed} onToggle={onToggle} />}
