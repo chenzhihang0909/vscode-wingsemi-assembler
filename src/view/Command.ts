@@ -173,6 +173,7 @@ function RegisterInstance(context: vscode.ExtensionContext) {
             // logger.info(makeToCMake(makefileJsonContent))
             // 获取clang信息
             await Resolve(context, {compilerInfo:{id:'riscv-clang',
+                activeFolder: path.join(workspaceRoot,folderName),
                 objdumper:path.join(CorePath,'llvm','bin','llvm-objdump'),
                 exe:path.join(CorePath,'llvm','bin','clang')
             }, src: {src:path.join(workspaceRoot,folderName),cmakeSource: makeToCMake(makefileJsonContent)}});

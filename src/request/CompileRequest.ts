@@ -61,7 +61,7 @@ export class CompileRequest {
         public compiler: string,
         public bypassCache: number,
         public options: CompileOptions | any,
-        public allowStoreCodeDebug: number,
+        public allowStoreCodeDebug: boolean,
         public files: { filename: string; contents: string }[]
     ) { }
 
@@ -74,8 +74,9 @@ export class CompileRequest {
         //     return new CompileRequest("c++", source, compiler, 0, options, 0, []);
         // } else if (instance instanceof MultiFileInstance) {
         const { files, cmakeSource } = await ReadCMakeSource(instance.src);
-        return new CompileRequest("c++", cmakeSource, compiler, 0, {
+        return new CompileRequest("c++", cmakeSource, compiler, 1, {
             compiler: {
+                activeFolder:instance.compilerInfo.activeFolder,
                 objdumper: instance.compilerInfo.objdumper,
                 exe: instance.compilerInfo.exe
             },
@@ -85,24 +86,27 @@ export class CompileRequest {
                 "binary": false,
                 "execute": false,
                 "intel": true,
-                "demangle": false,
-                "labels": false,
+                "demangle": true,
+                "labels": true,
                 "libraryCode": false,
-                "directives": false,
-                "commentOnly": false,
+                "directives": true,
+                "commentOnly": true,
                 "trim": false,
                 "debugCalls": false
             },
-            "userArguments": "-std=c++17",
+            "userArguments": "",
             "executeParameters": {
                 "args": [],
                 "stdin": ""
             },
             "compilerOptions": {
-                "cmakeArgs": "",
-                "customOutputFilename": "main"
+                "cmakeArgs": "-DCMAKE_BUILD_TYPE=RelWithDebInfo",
+                "customOutputFilename": "main",
+                "produceOptInfo":false,
+                "produceDevice":false,
+                "produceCfg":false
             }
-        }, 0, files);
+        }, true, files);
         // }
 
         // throw Error("Unknown instance type");

@@ -8,8 +8,9 @@ import { CompileRequest } from "./CompileRequest";
 import { CompilerInstance } from "../view/Instance";
 
 export async function Compile(instance: any): Promise<Response> {
+    logger.info(`Compile request: ${JSON.stringify(instance.compilerInfo)}`);
     const request = await CompileRequest.from(instance);
-    // logger.info(`Compile request: ${JSON.stringify(request)}`);
+    logger.info(`Compile request: ${JSON.stringify(request.options)}`);
     const headers = { "Content-Type": "application/json; charset=utf-8" };
     const suffix =  "/cmake";
     const url = `http://127.0.0.1:10240/api/compiler/riscv-clang${suffix}`;

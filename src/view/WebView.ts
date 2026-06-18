@@ -19,14 +19,12 @@ export class WebviewPanel {
     constructor(params: ShowWebviewParams) {
         const { context, editor } = params;
         const active = vscode.window.activeTextEditor;
-
         const panel = vscode.window.createWebviewPanel(
             "wingsemi-assembler-webview",
             "Wingsemi Assembler",
             vscode.ViewColumn.Beside,
             { enableScripts: true, enableFindWidget: true, retainContextWhenHidden: true }
         );
-
         panel.iconPath = singleIcon;
         panel.webview.html = getWebviewHtml(context.extensionPath, panel);
         panel.webview.onDidReceiveMessage(async (message) => {
@@ -39,9 +37,12 @@ export class WebviewPanel {
                 case "gotoLine":
                     const { file, lineNo } = message;
                     try {
+                        // console.log('----zzzz')
                         // 1. 根据文件路径打开编辑器
                         const uri = vscode.Uri.file(file);
-                        const editor = await vscode.window.showTextDocument(uri);
+                        const editor = await vscode.window.showTextDocument(uri,{
+                            viewColumn: vscode.ViewColumn.One
+                        });
 
                         // 2. 打开成功后，执行行号跳转逻辑
                         if (
@@ -60,7 +61,7 @@ export class WebviewPanel {
                         );
                     } catch (err) {
                         // 文件不存在/路径错误捕获异常
-                        vscode.window.showErrorMessage(`无法打开文件：${file}`);
+                        // vscode.window.showErrorMessage(`无法打开文件：${file}`);
                         console.error('打开文件失败', err);
                     }
                     return;
@@ -68,10 +69,15 @@ export class WebviewPanel {
         });
 
         const selectionChangedHandler = (event: vscode.TextEditorSelectionChangeEvent) => {
-            if (event.textEditor === editor) {
-                const lineNo = editor.selection.active.line;
-                panel.webview.postMessage({ command: "gotoLine", lineNo });
-            }
+            const activeEditor = vscode.window.activeTextEditor;
+            if (!activeEditor) return;
+
+            const lineNo = activeEditor.selection.active.line + 1;
+            panel.webview.postMessage({
+                command: "codetoLine",
+                lineNo,
+                file: activeEditor.document.fileName
+            });
         };
 
         const disposable = vscode.window.onDidChangeTextEditorSelection(throttle(selectionChangedHandler, 100));
@@ -88,7 +94,6 @@ export class WebviewPanel {
     postMessage(response: Response) {
         this.panel.webview.postMessage({ command: "setResults", results: response });
     }
-
     static clear() {
         for (const panel of WebviewPanel.panels) {
             panel.dispose();

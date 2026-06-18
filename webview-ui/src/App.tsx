@@ -1,6 +1,6 @@
 
 import ResultViewer from './components/ResultViewer';
-import { AnsiUp } from 'ansi_up';
+// import { AnsiUp } from 'ansi_up';
 import { useEffect, useRef, useState } from 'react';
 
 import { highlight } from '../../src/highlight/x86Intel';
@@ -8,7 +8,7 @@ import { MessageBase, useVsCode } from './utils/useVsCode';
 import { Response } from '../../src/request/CompileResult'
 import { VSCodePanels, VSCodePanelTab, VSCodePanelView, VSCodeProgressRing } from '@vscode/webview-ui-toolkit/react';
 
-const ansiUp = new AnsiUp();
+// const ansiUp = new AnsiUp();
 
 const changeFontSize = (node: HTMLElement, newSize: number) => {
   if (node.style.fontSize !== `${newSize}px`) {
@@ -35,11 +35,44 @@ function App() {
         setResponse((message as SetResultsMsg).results);
       } break;
       case 'gotoLine': {
+        // console.log('form---serve', message)
+        // console.log('---r',response)
         type GotoLineMsg = MessageBase & { lineNo: number, file: string };
         const f = gotoLine.current[activeId.current];
         if (f) {
           f((message as GotoLineMsg).lineNo, (message as GotoLineMsg).file);
         }
+      } break;
+      case 'codetoLine': {
+        
+        type GotoLineMsg = MessageBase & { lineNo: number, file: string };
+        let rlist:any = response?.compileResult.asm?.filter(item=>{
+          return item.source != null
+        })
+        let keylist:any = {}
+        rlist.forEach((item: any) => {
+            const key = item.source.line - 1;
+            if (!keylist[key]) {
+                keylist[key] = [];
+            }
+            keylist[key].push(item);
+        });
+        let findindex = -1
+        for(let i in keylist){
+          let one = keylist[i].find((item:any)=>{
+            return item.source.file === (message as GotoLineMsg).file && item.source.line === (message as GotoLineMsg).lineNo
+          })
+          if(one){
+            findindex = Number(i)
+          }
+        }
+        if(findindex != -1){
+           const f = gotoLine.current[activeId.current];
+            if (f) {
+              f(findindex, (message as GotoLineMsg).file);
+            }
+        }
+       
       } break;
     }
   });
@@ -66,34 +99,34 @@ function App() {
   }, [fontSize]);
 
   const asmText2html = (text: string) => highlight(text);
-  const consoleText2html = (text: string) => `<span class="wingsemi-assembler-output">${ansiUp.ansi_to_html(text)}</span>`;
+  // const consoleText2html = (text: string) => `<span class="wingsemi-assembler-output">${ansiUp.ansi_to_html(text)}</span>`;
 
-  const consoleOutput = (() => {
-    const result: { html: string, lineNo: number | null }[] = [];
-    for (const step of response?.compileResult?.buildsteps || []) {
-      for (const line of step.stdout) {
-        result.push({ html: consoleText2html(line.text), lineNo: null });
-      }
-    }
-    for (const step of response?.compileResult?.buildsteps || []) {
-      for (const line of step.stderr) {
-        result.push({ html: consoleText2html(line.text), lineNo: null });
-      }
-    }
+  // const consoleOutput = (() => {
+  //   const result: { html: string, lineNo: number | null }[] = [];
+  //   for (const step of response?.compileResult?.buildsteps || []) {
+  //     for (const line of step.stdout) {
+  //       result.push({ html: consoleText2html(line.text), lineNo: null });
+  //     }
+  //   }
+  //   for (const step of response?.compileResult?.buildsteps || []) {
+  //     for (const line of step.stderr) {
+  //       result.push({ html: consoleText2html(line.text), lineNo: null });
+  //     }
+  //   }
 
-    // for cmake
-    response?.compileResult?.result?.stderr?.forEach(x => result.push({ html: consoleText2html(x.text), lineNo: null }));
-    response?.compileResult?.result?.stdout?.forEach(x => result.push({ html: consoleText2html(x.text), lineNo: null }));
+  //   // for cmake
+  //   response?.compileResult?.result?.stderr?.forEach(x => result.push({ html: consoleText2html(x.text), lineNo: null }));
+  //   response?.compileResult?.result?.stdout?.forEach(x => result.push({ html: consoleText2html(x.text), lineNo: null }));
 
-    // for single file
-    response?.compileResult?.stderr?.forEach(x => result.push({ html: consoleText2html(x.text), lineNo: null }));
-    response?.compileResult?.stdout?.forEach(x => result.push({ html: consoleText2html(x.text), lineNo: null }));
+  //   // for single file
+  //   response?.compileResult?.stderr?.forEach(x => result.push({ html: consoleText2html(x.text), lineNo: null }));
+  //   response?.compileResult?.stdout?.forEach(x => result.push({ html: consoleText2html(x.text), lineNo: null }));
 
-    return result;
-  })();
+  //   return result;
+  // })();
 
-  const asmRes = ((response?.compileResult.result?.asm || response?.compileResult.asm))?.map(x => ({ html: asmText2html(x.text), lineNo: x.source?.line, file: x.source?.file }));
-  const execStdoutRes = (response?.executeResult?.execResult || response?.executeResult)?.stdout?.map(x => ({ html: consoleText2html(x.text) }));
+  const asmRes = ((response?.compileResult.result?.asm || response?.compileResult.asm))?.map(x => ({ html: asmText2html(x.text), lineNo: x.source?.line, file: x.source?.file ?? "" }));
+  // const execStdoutRes = (response?.executeResult?.execResult || response?.executeResult)?.stdout?.map(x => ({ html: consoleText2html(x.text) }));
 
 
   const onSelect = (line: number, file: string) => {

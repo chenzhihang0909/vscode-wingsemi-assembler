@@ -122,7 +122,7 @@ function makeToCMake(makeContent:any) {
   ldFlags.forEach((opt: string) => lines.push(`    ${opt}`));
   if (ldScript) lines.push(`    -T ${ldScript}`);
   lines.push(`    -Wl,--no-warn-mismatch`);
-  lines.push(`    -Wl,--gc-sections`);
+  // lines.push(`    -Wl,--gc-sections`);
   lines.push(`)`);
   lines.push('');
 

@@ -6,7 +6,7 @@ import ResultBlock, { ResultBlockRef } from "./ResultBlock";
 export interface ResultViewerLine {
   html: string,
   lineNo?: number | null | undefined,
-  file:string
+  file?:string
 }
 
 export interface ResultViewerProps {
@@ -21,6 +21,8 @@ const ResultViewerImpl: ForwardRefRenderFunction<(line: number, file: string) =>
 
   const onSelect = useCallback((lineNo: number, file: string) => {
     console.log(`Select line ${lineNo} in file ${file}`);
+    // console.log('results---',props.results)
+    // console.log(lineNo2blocks)
     // Unselect the previous selected line
     lineNo2blocks.current[currentLineNo.current]?.setIsSelected(false);
     // Select the current line
@@ -73,12 +75,15 @@ const ResultViewerImpl: ForwardRefRenderFunction<(line: number, file: string) =>
                     />);
     };
 
-    // Group results by lineNo
+    // 在group循环外部新增
+    let currentGroupFile = "";
+
+    // 循环内赋值
     for (const [i, line ] of results.entries()) {
       if (typeof line.lineNo !== 'number') {
         if (lastLineNo !== -1) {
-          // If last code block map to a lineNo, create a CodeBlock and a ref
-          addResultBlockWithLineNo(resultsBlocks.length, lastLineNo, line.file, results.slice(l, i).map(x => x.html));
+          // 传缓存的文件
+          addResultBlockWithLineNo(resultsBlocks.length, lastLineNo, currentGroupFile, results.slice(l, i).map(x => x.html));
         }
         resultsBlocks.push(<ResultBlock
                             key={resultsBlocks.length}
@@ -89,17 +94,17 @@ const ResultViewerImpl: ForwardRefRenderFunction<(line: number, file: string) =>
         l = i + 1;
       } else if (line.lineNo !== lastLineNo) {
         if (lastLineNo !== -1) {
-          // If last code block map to a lineNo, create a CodeBlock and a ref
-          addResultBlockWithLineNo(resultsBlocks.length, lastLineNo, line.file, results.slice(l, i).map(x => x.html));
+          addResultBlockWithLineNo(resultsBlocks.length, lastLineNo, currentGroupFile, results.slice(l, i).map(x => x.html));
           l = i;
         }
         lastLineNo = line.lineNo;
-      } else {
-        // Relate to the same lineNo, do nothing
+        // 更新当前分组文件
+        currentGroupFile = line.file ?? "";
       }
     }
+    // 兜底时使用缓存的currentGroupFile，不再填空字符串
     if (lastLineNo !== -1) {
-      addResultBlockWithLineNo(resultsBlocks.length, lastLineNo, '', results.slice(l).map(x => x.html));
+      addResultBlockWithLineNo(resultsBlocks.length, lastLineNo, currentGroupFile, results.slice(l).map(x => x.html));
     }
 
     return resultsBlocks;
