@@ -119,7 +119,7 @@ function makeToCMake(makeContent:any) {
 
 
   lines.push(`add_link_options(`);
-  ldFlags.forEach((opt: string) => lines.push(`    ${opt}`));
+  ldFlags.forEach((opt: string) => opt.indexOf('--gc-sections') === -1 && lines.push(`    ${opt}`));
   if (ldScript) lines.push(`    -T ${ldScript}`);
   lines.push(`    -Wl,--no-warn-mismatch`);
   // lines.push(`    -Wl,--gc-sections`);
