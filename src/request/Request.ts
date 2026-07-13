@@ -18,7 +18,7 @@ export async function Compile(instance: any): Promise<Response> {
     return retry("Compiling", async () => {
         logger.info(`Request for Compile from "${url}"`);
         const compileResult = await axios.post(url, JSON.stringify(request), { headers: headers });
-
+        // console.log('---compileResult', compileResult.data)
         if (instance.compilerInfo.supportsExecute && instance.filters.execute) {
             request.options.fitExecute();
 
@@ -27,7 +27,7 @@ export async function Compile(instance: any): Promise<Response> {
             return { compileResult: compileResult.data, executeResult: executeResult.data };
         }
 
-        return { compileResult: compileResult.data.result };
+        return { compileResult: compileResult.data.result, executeResult: compileResult.data.result};
     });
 }
 

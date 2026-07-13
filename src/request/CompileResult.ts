@@ -228,6 +228,10 @@ export type ExecuteResult = {
     okToCache?: boolean;
     stdout?: ResultLine[];
     stderr?: ResultLine[];
+    result?: {
+        stdout?: ResultLine[];
+        stderr?: ResultLine[];
+    }
     execTime?: string;
     processExecutionResultTime?: number;
     timedOut?: boolean;

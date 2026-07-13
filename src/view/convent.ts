@@ -2,9 +2,10 @@
  * 动态解析 Makefile 生成 CMakeLists.txt
  * 自动提取：项目名、编译器、编译选项、头文件、链接配置、源码目录
  * @param {string} makeContent 原始 Makefile 文本
+ * @param {object} objsJsonContent OBJS.json 解析后的JSON对象，包含OBJS数组
  * @returns {string} 生成的 CMake 内容
  */
-function makeToCMake(makeContent:any) {
+function makeToCMake(makeContent: string, objsJsonContent: any) {
   // 提取项目名 (Target project: xxx)
   const getProjectName = () => {
     const m = makeContent.match(/Target project:\s*(\w+)/);
@@ -61,15 +62,31 @@ function makeToCMake(makeContent:any) {
     return ret;
   };
 
-  // 提取源码目录（从 include xxx/subdir.mk）
+  // 【重写】从 OBJS.json 的 .o 文件路径解析源码目录
   const getSrcDirs = () => {
-    const reg = /include\s+([\w/]+\/subdir\.mk)/g;
-    const dirs = new Set();
-    let res;
-    while ((res = reg.exec(makeContent))) {
-      dirs.add(res[1].replace('/subdir.mk', ''));
+    const objList = objsJsonContent?.OBJS ?? [];
+    const dirSet = new Set<string>();
+
+    for (const objPath of objList) {
+      // 示例路径：/xxx/demo_130C/output/Application/main.o
+      // 1. 分割路径，去掉文件名 main.o
+      const pathParts = objPath.split('/');
+      pathParts.pop(); // 删除 .o 文件名
+      const objDir = pathParts.join('/');
+
+      // 2. 剔除 output 输出目录，得到源码根目录（output 是编译输出，源码在上一级）
+      const outputMarker = '/output/';
+      const outputPos = objDir.indexOf(outputMarker);
+      if (outputPos === -1) continue;
+
+      // 截取 output 前面的项目根 + output后一级目录
+      const srcDirRaw = objDir.slice(outputPos + outputMarker.length);
+      if (!srcDirRaw) continue;
+
+      dirSet.add(srcDirRaw);
     }
-    return Array.from(dirs);
+
+    return Array.from(dirSet);
   };
 
   // 统一提取所有动态变量
@@ -82,7 +99,6 @@ function makeToCMake(makeContent:any) {
 
   // 拼接 CMake 文本
   const lines = [];
-
 
   lines.push(`set(CMAKE_C_COMPILER_WORKS ON CACHE BOOL "" FORCE)`);
   lines.push(`set(CMAKE_C_COMPILER_FORCED ON)`);
@@ -99,12 +115,10 @@ function makeToCMake(makeContent:any) {
   lines.push(`enable_language(ASM)`);
   lines.push('');
 
-
   lines.push(`add_compile_options(`);
   cFlags.forEach((opt: string) => lines.push(`    ${opt}`));
   lines.push(`)`);
   lines.push('');
-
 
   lines.push(`include_directories(`);
   incPaths.forEach((p: string) => lines.push(`    ${p}`));
@@ -112,11 +126,9 @@ function makeToCMake(makeContent:any) {
   lines.push('');
 
   if (libDir) {
-
     lines.push(`link_directories(${libDir})`);
     lines.push('');
   }
-
 
   lines.push(`add_link_options(`);
   ldFlags.forEach((opt: string) => opt.indexOf('--gc-sections') === -1 && lines.push(`    ${opt}`));
@@ -126,9 +138,8 @@ function makeToCMake(makeContent:any) {
   lines.push(`)`);
   lines.push('');
 
-
   lines.push(`file(GLOB_RECURSE SOURCES`);
-  srcDirs.forEach((d: any) => lines.push(`    \${PROJECT_SOURCE_DIR}/${d}/*.[cS]`));
+  srcDirs.forEach((d: string) => lines.push(`    \${PROJECT_SOURCE_DIR}/${d}/*.[cS]`));
   lines.push(`)`);
   lines.push('');
 

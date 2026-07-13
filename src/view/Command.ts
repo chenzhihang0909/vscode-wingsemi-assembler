@@ -147,14 +147,18 @@ function RegisterInstance(context: vscode.ExtensionContext) {
             logger.info(activeFile)
             const folderName = activeFile.replace(/[\\/]/g, "/").replace(/^\/+/, "").split("/")[0] || "";
             const makefilePath = path.join(workspaceRoot,folderName, 'output', 'makefile');
+            const objsPath = path.join(workspaceRoot,folderName, 'output', 'OBJS.json');
             const projectSettingPath = path.join(workspaceRoot,folderName, 'config', 'setting.json');
             let makefileJsonContent = '';
             let projectSettingJsonContent:any = {};
             let CorePath = '';
+            let objsJsonContent = {}
             try {
                 const makefileContent = await fs.readFile(makefilePath, 'utf8');
                 makefileJsonContent =  makefileContent.toString()
                 const projectSettingContent = await fs.readFile(projectSettingPath, 'utf8');
+                const objsContent = await fs.readFile(objsPath, 'utf8');
+                objsJsonContent = JSON.parse(objsContent);
                 projectSettingJsonContent = JSON.parse(projectSettingContent);
                 if(projectSettingJsonContent['Core']){
                     CorePath = projectSettingJsonContent['Core'].path;
@@ -169,14 +173,14 @@ function RegisterInstance(context: vscode.ExtensionContext) {
             logger.info(activeFile)
             logger.info(workspaceRoot)
             logger.info(folderName)
-            // logger.info(makefileJsonContent)
-            // logger.info(makeToCMake(makefileJsonContent))
+            logger.info(makefileJsonContent)
+            logger.info(makeToCMake(makefileJsonContent, objsJsonContent))
             // 获取clang信息
             await Resolve(context, {compilerInfo:{id:'riscv-clang',
                 activeFolder: path.join(workspaceRoot,folderName),
                 objdumper:path.join(CorePath,'llvm','bin','llvm-objdump'),
                 exe:path.join(CorePath,'llvm','bin','clang')
-            }, src: {src:path.join(workspaceRoot,folderName),cmakeSource: makeToCMake(makefileJsonContent)}});
+            }, src: {src:path.join(workspaceRoot,folderName),cmakeSource: makeToCMake(makefileJsonContent, objsJsonContent)}});
         } catch (error: unknown) {
             logger.error(
                 `error: ${(error as Error).message}`

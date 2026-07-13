@@ -1,6 +1,6 @@
 
 import ResultViewer from './components/ResultViewer';
-// import { AnsiUp } from 'ansi_up';
+import { AnsiUp } from 'ansi_up';
 import { useEffect, useRef, useState } from 'react';
 
 import { highlight } from '../../src/highlight/x86Intel';
@@ -8,7 +8,7 @@ import { MessageBase, useVsCode } from './utils/useVsCode';
 import { Response } from '../../src/request/CompileResult'
 import { VSCodePanels, VSCodePanelTab, VSCodePanelView, VSCodeProgressRing } from '@vscode/webview-ui-toolkit/react';
 
-// const ansiUp = new AnsiUp();
+const ansiUp = new AnsiUp();
 
 const changeFontSize = (node: HTMLElement, newSize: number) => {
   if (node.style.fontSize !== `${newSize}px`) {
@@ -99,7 +99,7 @@ function App() {
   }, [fontSize]);
 
   const asmText2html = (text: string) => highlight(text);
-  // const consoleText2html = (text: string) => `<span class="wingsemi-assembler-output">${ansiUp.ansi_to_html(text)}</span>`;
+  const consoleText2html = (text: string) => `<span class="wingsemi-assembler-output">${ansiUp.ansi_to_html(text)}</span>`;
 
   // const consoleOutput = (() => {
   //   const result: { html: string, lineNo: number | null }[] = [];
@@ -126,8 +126,10 @@ function App() {
   // })();
 
   const asmRes = ((response?.compileResult.result?.asm || response?.compileResult.asm))?.map(x => ({ html: asmText2html(x.text), lineNo: x.source?.line, file: x.source?.file ?? "" }));
-  // const execStdoutRes = (response?.executeResult?.execResult || response?.executeResult)?.stdout?.map(x => ({ html: consoleText2html(x.text) }));
+  const execStdoutRes = (response?.executeResult)?.stderr?.map(x => ({ html: consoleText2html(x.text) }));
 
+  console.log('---asmRes', response)
+  console.log('---execStdoutRes', response)
 
   const onSelect = (line: number, file: string) => {
     // @ts-expect-error TODO: better type hint
@@ -151,7 +153,11 @@ function App() {
         <ResultViewer results={consoleOutput} onSelect={onSelect} text2html={consoleText2html} ref={f => gotoLine.current.stderr = f} />
       </VSCodePanelView> */}
       <VSCodePanelView id='asm'>
-        <ResultViewer results={asmRes} onSelect={onSelect} text2html={asmText2html} ref={f => gotoLine.current.asm = f} />
+       {
+        response?.compileResult.code == 0? <ResultViewer results={asmRes} onSelect={onSelect} text2html={asmText2html} ref={f => gotoLine.current.asm = f} />:<ResultViewer results={execStdoutRes} onSelect={onSelect} text2html={consoleText2html} ref={f => gotoLine.current.exeout = f} />
+       } 
+        
+      
       </VSCodePanelView>
       {/* <VSCodePanelView id='stdout'>
         <ResultViewer results={execStdoutRes} onSelect={onSelect} text2html={consoleText2html} ref={f => gotoLine.current.exeout = f} />
